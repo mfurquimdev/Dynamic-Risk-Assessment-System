@@ -110,3 +110,6 @@ venv.bak/
 outputs/
 *.sav
 *.pkl
+
+# Ignore output of ingestion.py
+ingesteddata/

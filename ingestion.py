@@ -23,11 +23,9 @@ def merge_multiple_dataframe():
     CSV files are detected automatically.
     Output csv is called `finaldata.csv` and the report is named `ingestedfiles.csv`.
     """
-    # check for datasets, compile them together, and write to an output file
     input_path = Path(input_folder_path)
     input_files = sorted(input_path.rglob("*.csv"))
 
-    print(f"\n{input_files}")
     output_path = Path(output_folder_path)
     output_path.mkdir(exist_ok=True)
 
@@ -55,6 +53,8 @@ def merge_multiple_dataframe():
 
         all_records = all_records.append(record, ignore_index=True)
         final_df = final_df.append(df).reset_index(drop=True)
+
+    final_df.drop_duplicates(ignore_index=True, inplace=True)
 
     all_records.to_csv(records_path, index=False)
     final_df.to_csv(final_data_path, index=False)
