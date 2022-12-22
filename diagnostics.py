@@ -14,7 +14,7 @@ with open("config.json", "r") as f:
 
 
 dataset_csv_path = Path(config["output_folder_path"])
-test_data_path = Path(config["test_data_path"])
+test_data_dir = Path(config["test_data_path"])
 prod_deployment_path = Path(config["prod_deployment_path"])
 
 ##################Function to get model predictions
@@ -83,9 +83,8 @@ def outdated_packages_list():
         fd.write(requirements)
 
 
-def preprocess_data():
-    test_filename = "testdata.csv"
-    X = pd.read_csv(Path(test_data_path, test_filename))
+def preprocess_data(test_data_path):
+    X = pd.read_csv(test_data_path)
     y = X.pop("exited")
 
     X = X.select_dtypes(include=["number"])
@@ -94,7 +93,8 @@ def preprocess_data():
 
 
 if __name__ == "__main__":
-    X, y = preprocess_data()
+    test_data_path = Path(test_data_dir, "testdata.csv")
+    X, y = preprocess_data(test_data_path)
 
     y_pred = model_predictions(X)
 
