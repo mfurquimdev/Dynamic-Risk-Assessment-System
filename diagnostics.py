@@ -82,14 +82,42 @@ def outdated_packages_list():
     with open("new_requirements.txt", "wb") as fd:
         fd.write(requirements)
 
+    report = {
+        "broken": broken.decode("utf-8"),
+        "installed": installed.decode("utf-8"),
+        "requirements": requirements.decode("utf-8"),
+    }
+    return report
+
 
 def preprocess_data(test_data_path):
     X = pd.read_csv(test_data_path)
-    y = X.pop("exited")
+
+    if "exited" in X.columns:
+        y = X.pop("exited")
+    else:
+        y = None
 
     X = X.select_dtypes(include=["number"])
 
     return X, y
+
+
+def model_summary_statistics():
+    test_data_path = Path(test_data_dir, "testdata.csv")
+    X, y = preprocess_data(test_data_path)
+
+    y_pred = model_predictions(X)
+
+    summary = dataframe_summary(X)
+
+    return summary
+
+
+def missing_data():
+    test_data_path = Path(test_data_dir, "testdata.csv")
+    X, y = preprocess_data(test_data_path)
+    return check_missing_data(X)
 
 
 if __name__ == "__main__":

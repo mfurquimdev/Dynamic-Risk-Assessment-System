@@ -25,9 +25,10 @@ def preprocess_data():
 
 
 #################Function for model scoring
-def score_model(X, y):
+def score_model():
     # this function should take a trained model, load test data, and calculate an F1 score for the model relative to the test data
     # it should write the result to the latestscore.txt file
+    X, y = preprocess_data()
 
     model_filename = "trainedmodel.pkl"
     model = pickle.load(open(Path(output_model_path, model_filename), "rb"))
@@ -39,7 +40,8 @@ def score_model(X, y):
     with open(score_path, "w") as fd:
         fd.write(str(f1))
 
+    return f1
+
 
 if __name__ == "__main__":
-    X, y = preprocess_data()
-    score_model(X, y)
+    score_model()
