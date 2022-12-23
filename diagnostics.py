@@ -6,7 +6,8 @@ import timeit
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
+
+from preprocess import preprocess_data
 
 ##################Load config.json and get environment variables
 with open("config.json", "r") as f:
@@ -16,11 +17,12 @@ with open("config.json", "r") as f:
 dataset_csv_path = Path(config["output_folder_path"])
 test_data_dir = Path(config["test_data_path"])
 prod_deployment_path = Path(config["prod_deployment_path"])
+test_filename = config["test_filename"]
 
 ##################Function to get model predictions
 def model_predictions(X):
     # read the deployed model and a test dataset, calculate predictions
-    model_filename = "trainedmodel.pkl"
+    model_filename = config["model_filename"]
     model = pickle.load(open(Path(prod_deployment_path, model_filename), "rb"))
     y_pred = model.predict(X)
 
@@ -30,7 +32,7 @@ def model_predictions(X):
 ##################Function to get summary statistics
 def dataframe_summary(X):
     # calculate summary statistics here
-    summary_filename = "summary_statistics.csv"
+    summary_filename = config["summary_filename"]
     summary_path = Path(dataset_csv_path, summary_filename)
 
     summary_statistics = []
@@ -69,17 +71,16 @@ def execution_time():
 
 ##################Function to check dependencies
 def outdated_packages_list():
-    # get a list of
     broken = subprocess.check_output(["pip", "check"])
-    with open("broken.txt", "wb") as fd:
+    with open(config["broken_filename"], "wb") as fd:
         fd.write(broken)
 
     installed = subprocess.check_output(["pip", "list"])
-    with open("installed.txt", "wb") as fd:
+    with open(config["installed_filename"], "wb") as fd:
         fd.write(installed)
 
     requirements = subprocess.check_output(["pip", "freeze"])
-    with open("new_requirements.txt", "wb") as fd:
+    with open(config["new_requirements_filename"], "wb") as fd:
         fd.write(requirements)
 
     report = {
@@ -90,22 +91,8 @@ def outdated_packages_list():
     return report
 
 
-def preprocess_data(test_data_path):
-    X = pd.read_csv(test_data_path)
-
-    if "exited" in X.columns:
-        y = X.pop("exited")
-    else:
-        y = None
-
-    X = X.select_dtypes(include=["number"])
-
-    return X, y
-
-
 def model_summary_statistics():
-    test_data_path = Path(test_data_dir, "testdata.csv")
-    X, y = preprocess_data(test_data_path)
+    X, y = preprocess_data(test_data_dir, test_filename)
 
     y_pred = model_predictions(X)
 
@@ -114,22 +101,28 @@ def model_summary_statistics():
     return summary
 
 
-def missing_data():
-    test_data_path = Path(test_data_dir, "testdata.csv")
-    X, y = preprocess_data(test_data_path)
+def check_missing_test_data():
+    X, _ = preprocess_data(test_data_dir, test_filename)
     return check_missing_data(X)
 
 
+def run_diagnostics(directory, filename):
+    X, _ = preprocess_data(directory, filename)
+    percentage_missing = check_missing_data(X)
+    df_summary = dataframe_summary(X)
+
+    return percentage_missing, df_summary
+
+
 if __name__ == "__main__":
-    test_data_path = Path(test_data_dir, "testdata.csv")
-    X, y = preprocess_data(test_data_path)
+    X, y = preprocess_data(test_data_dir, test_filename)
 
     y_pred = model_predictions(X)
 
     summary = dataframe_summary(X)
 
-    check_missing_data(X)
+    percentage_missing = check_missing_data(X)
 
-    dataframe_summary(X)
-    print(execution_time())
-    outdated_packages_list()
+    executing_time = execution_time()
+
+    packages_report = outdated_packages_list()

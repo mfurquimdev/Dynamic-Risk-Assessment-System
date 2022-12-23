@@ -14,6 +14,7 @@ with open("config.json", "r") as f:
     config = json.load(f)
 
 output_model_path = Path(config["output_model_path"])
+api_returns_filename = config["api_returns_filename"]
 
 
 def make_request(endpoint, url=URL, port=port, method="GET", params=None):
@@ -34,23 +35,27 @@ def make_request(endpoint, url=URL, port=port, method="GET", params=None):
     return response.text
 
 
-# Call each API endpoint and store the responses
-response1 = make_request(endpoint="prediction", params={"filename": "testdata/testdata.csv"}, method="POST")
-response2 = make_request(endpoint="scoring")
-response3 = make_request(endpoint="summarystats")
-response4 = make_request(endpoint="diagnostics")
+def make_calls(api_returns_filename=api_returns_filename):
+    responses_path = Path(output_model_path, "apireturns.txt")
+    # Call each API endpoint and store the responses
+    response1 = make_request(endpoint="prediction", params={"filename": "testdata/testdata.csv"}, method="POST")
+    response2 = make_request(endpoint="scoring")
+    response3 = make_request(endpoint="summarystats")
+    response4 = make_request(endpoint="diagnostics")
+
+    # combine all API responses
+    # combine reponses here
+    responses = {
+        "prediction": response1,
+        "scoring": eval(response2),
+        "summarystats": eval(response3),
+        "diagnostics": eval(response4),
+    }
+
+    # write the responses to your workspace
+    with open(Path(output_model_path, api_returns_filename), "w") as fd:
+        pprint.pprint(responses, stream=fd)
 
 
-# combine all API responses
-responses = {
-    "prediction": response1,
-    "scoring": eval(response2),
-    "summarystats": eval(response3),
-    "diagnostics": eval(response4),
-}
-# combine reponses here
-
-# write the responses to your workspace
-responses_path = Path(output_model_path, "apireturns.txt")
-with open(responses_path, "w") as fd:
-    pprint.pprint(responses, stream=fd)
+if __name__ == "__main__":
+    make_calls()

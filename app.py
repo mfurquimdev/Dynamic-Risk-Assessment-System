@@ -10,12 +10,12 @@ from flask import jsonify
 from flask import request
 from flask import session
 
+from diagnostics import check_missing_test_data
 from diagnostics import execution_time
-from diagnostics import missing_data
 from diagnostics import model_predictions
 from diagnostics import model_summary_statistics
 from diagnostics import outdated_packages_list
-from diagnostics import preprocess_data
+from preprocess import preprocess_data
 from scoring import score_model
 
 
@@ -40,7 +40,7 @@ def predict():
     filename = request.args.get("filename")
     print(f"filename = {filename}")
 
-    X, _ = preprocess_data(filename)
+    X, _ = preprocess_data(*filename.split("/"))
     print(f"X = {X}")
 
     y_pred = model_predictions(X)
@@ -81,14 +81,14 @@ def diagnostics():
     print(f"{request.method} at {request.path} with {request.args}")
     executing_time = execution_time()
     print(f"executing_time {executing_time}")
-    perct_missing = missing_data()
-    print(f"perct_missing {perct_missing}")
+    percentage_missing = check_missing_test_data()
+    print(f"perct_missing {percentage_missing}")
     package_report = outdated_packages_list()
     print(f"package_report {package_report}")
 
     diagnosis = {
         "executing_time": executing_time,
-        "perct_missing": perct_missing,
+        "perct_missing": percentage_missing,
         "package_report": package_report,
     }
 

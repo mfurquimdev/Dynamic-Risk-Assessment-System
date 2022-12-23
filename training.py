@@ -2,8 +2,9 @@ import json
 import pickle
 from pathlib import Path
 
-import pandas as pd
 from sklearn.linear_model import LogisticRegression
+
+from preprocess import preprocess_data
 
 
 ###################Load config.json and get path variables
@@ -14,16 +15,9 @@ dataset_csv_path = Path(config["output_folder_path"])
 output_model_path = Path(config["output_model_path"])
 output_model_path.mkdir(exist_ok=True)
 
+dataset_filename = config["dataset_filename"]
 
-def preprocess_data():
-    train_filename = "finaldata.csv"
-    X = pd.read_csv(Path(dataset_csv_path, train_filename))
-    y = X.pop("exited")
-
-    X = X.select_dtypes(include=["number"])
-
-    return X, y
-
+model_filename = config["model_filename"]
 
 #################Function for training the model
 def train_model(X, y):
@@ -51,11 +45,14 @@ def train_model(X, y):
     model.fit(X, y)
 
     # write the trained model to your workspace in a file called trainedmodel.pkl
-    model_filename = "trainedmodel.pkl"
     with open(Path(output_model_path, model_filename), "wb") as fd:
         pickle.dump(model, fd)
 
 
-if __name__ == "__main__":
-    X, y = preprocess_data()
+def preprocess_and_train():
+    X, y = preprocess_data(dataset_csv_path, dataset_filename)
     train_model(X, y)
+
+
+if __name__ == "__main__":
+    preprocess_and_train()

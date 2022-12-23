@@ -11,7 +11,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 
 from diagnostics import model_predictions
-from diagnostics import preprocess_data
+from preprocess import preprocess_data
 
 ###############Load config.json and get path variables
 with open("config.json", "r") as f:
@@ -20,23 +20,27 @@ with open("config.json", "r") as f:
 dataset_csv_dir = Path(config["output_folder_path"])
 test_data_dir = Path(config["test_data_path"])
 output_model_dir = Path(config["output_model_path"])
-
+test_filename = Path(config["test_filename"])
+confusion_matrix_filename = Path(config["confusion_matrix_filename"])
 
 ##############Function for reporting
-def score_model():
+def plot_confusion_matrix(
+    data_dir=test_data_dir,
+    data_filename=test_filename,
+    confusion_matrix_filename=confusion_matrix_filename,
+):
     # calculate a confusion matrix using the test data and the deployed model
     # write the confusion matrix to the workspace
 
-    test_data_path = Path(test_data_dir, "testdata.csv")
-    X, y = preprocess_data(test_data_path)
+    X, y = preprocess_data(data_dir, data_filename)
     y_pred = model_predictions(X)
 
     model_confusion_matrix = confusion_matrix(y, y_pred)
     display_confusion_matrix = ConfusionMatrixDisplay(confusion_matrix=model_confusion_matrix)
     display_confusion_matrix.plot()
-    confusion_matrix_filepath = Path(output_model_dir, "confusionmatrix.png")
+    confusion_matrix_filepath = Path(output_model_dir, confusion_matrix_filename)
     plt.savefig(confusion_matrix_filepath)
 
 
 if __name__ == "__main__":
-    score_model()
+    plot_confusion_matrix()

@@ -11,7 +11,8 @@ with open("config.json", "r") as f:
 
 input_folder_path = config["input_folder_path"]
 output_folder_path = config["output_folder_path"]
-
+dataset_filename = config["dataset_filename"]
+ingested_filename = config["ingested_filename"]
 
 #############Function for data ingestion
 def merge_multiple_dataframe():
@@ -29,11 +30,9 @@ def merge_multiple_dataframe():
     output_path = Path(output_folder_path)
     output_path.mkdir(exist_ok=True)
 
-    final_data_filename = "finaldata.csv"
-    final_data_path = Path(output_folder_path, final_data_filename)
+    final_data_path = Path(output_folder_path, dataset_filename)
 
-    records_filename = "ingestedfiles.csv"
-    records_path = Path(output_folder_path, records_filename)
+    records_path = Path(output_folder_path, ingested_filename)
 
     all_records = pd.DataFrame(columns=["source_location", "filename", "data_length", "timestamp"])
 
@@ -51,13 +50,29 @@ def merge_multiple_dataframe():
             "timestamp": datetimestr,
         }
 
-        all_records = all_records.append(record, ignore_index=True)
         final_df = final_df.append(df).reset_index(drop=True)
+        all_records = all_records.append(record, ignore_index=True)
 
     final_df.drop_duplicates(ignore_index=True, inplace=True)
+    final_df.to_csv(final_data_path, index=False)
 
     all_records.to_csv(records_path, index=False)
-    final_df.to_csv(final_data_path, index=False)
+
+
+def is_there_new_data():
+    input_path = Path(input_folder_path)
+    input_files_path = sorted(input_path.rglob("*.csv"))
+    input_files = {file.name for file in input_files_path}
+
+    records_path = Path(output_folder_path, ingested_filename)
+
+    if not records_path.exists():
+        return True
+
+    df = pd.read_csv(records_path)
+    ingested_files = set(df["filename"].values)
+
+    return not input_files.issubset(ingested_files)
 
 
 if __name__ == "__main__":

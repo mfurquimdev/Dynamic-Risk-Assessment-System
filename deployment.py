@@ -13,9 +13,9 @@ output_model_path = Path(config["output_model_path"])
 prod_deployment_path = Path(config["prod_deployment_path"])
 prod_deployment_path.mkdir(exist_ok=True)
 
-ingested_filename = "ingestedfiles.csv"
-score_filename = "latestscore.txt"
-model_filename = "trainedmodel.pkl"
+ingested_filename = config["ingested_filename"]
+score_filename = config["score_filename"]
+model_filename = config["model_filename"]
 
 ingested_path = Path(dataset_csv_path, ingested_filename)
 score_path = Path(output_model_path, score_filename)

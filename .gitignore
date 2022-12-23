@@ -107,9 +107,3 @@ venv.bak/
 .idea/
 
 *.DS_Store
-outputs/
-*.sav
-*.pkl
-
-# Ignore output of ingestion.py
-ingesteddata/
