@@ -115,6 +115,7 @@ def run_diagnostics(directory, filename):
 
 
 if __name__ == "__main__":
+    print("Running main diagnostics")
     X, y = preprocess_data(test_data_dir, test_filename)
 
     y_pred = model_predictions(X)

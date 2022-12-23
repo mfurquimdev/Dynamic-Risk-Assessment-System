@@ -55,4 +55,5 @@ def preprocess_and_train():
 
 
 if __name__ == "__main__":
+    print("Running main traning")
     preprocess_and_train()

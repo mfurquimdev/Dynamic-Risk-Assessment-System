@@ -1,4 +1,4 @@
-{'diagnostics': {'executing_time': [0.3405599730031099, 0.6955233610060532],
+{'diagnostics': {'executing_time': [0.34568989800754935, 0.6871860650135204],
                  'package_report': {'broken': 'No broken requirements found.\n',
                                     'installed': 'Package            Version\n'
                                                  '------------------ '
@@ -89,8 +89,8 @@
                                                     'wcwidth==0.2.5\n'
                                                     'Werkzeug==1.0.1\n'},
                  'perct_missing': [0.0, 0.0, 0.0]},
- 'prediction': '[0 1 1 1 1]',
- 'scoring': 0.5714285714285715,
+ 'prediction': '[0 1 1 0 1]',
+ 'scoring': 0.3333333333333333,
  'summarystats': [[76.6, 34.0, 85.9897668330366],
                   [3100.4, 675.0, 4680.360310916244],
                   [227.2, 25.0, 387.9254567568362]]}

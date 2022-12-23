@@ -43,4 +43,5 @@ def plot_confusion_matrix(
 
 
 if __name__ == "__main__":
+    print("Running main reporting")
     plot_confusion_matrix()

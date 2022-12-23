@@ -76,4 +76,5 @@ def is_there_new_data():
 
 
 if __name__ == "__main__":
+    print("Running main ingestion")
     merge_multiple_dataframe()

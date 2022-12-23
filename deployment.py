@@ -30,4 +30,5 @@ def store_model_into_pickle():
 
 
 if __name__ == "__main__":
+    print("Running main deployment")
     store_model_into_pickle()
